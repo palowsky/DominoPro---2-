@@ -13,20 +13,36 @@
         body {
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
+            background-color: #020617;
         }
         .glass-card {
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.7);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .glass-button {
-            background: rgba(14, 165, 233, 0.2);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(14, 165, 233, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
         .black-italic {
             font-weight: 900;
             font-style: italic;
+        }
+
+        @keyframes pulse-patriotic {
+            0%, 100% { box-shadow: 0 0 10px rgba(29, 78, 216, 0.3); border-color: rgba(29, 78, 216, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(220, 38, 38, 0.4); border-color: rgba(220, 38, 38, 0.5); }
+        }
+
+        .animate-streak {
+            animation: pulse-patriotic 3s ease-in-out infinite;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
         }
     </style>
 <script type="importmap">

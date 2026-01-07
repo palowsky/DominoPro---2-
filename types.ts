@@ -22,7 +22,7 @@ export interface AchievementEvent {
 export interface Player {
   id: string;
   name: string;
-  nickname: string;
+  nickname?: string;
   xp: number;
   level: Level;
   wins: number;

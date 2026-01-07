@@ -38,11 +38,11 @@ const App: React.FC = () => {
     return unsub;
   }, []);
 
-  const handleAddPlayer = (name: string, nickname: string) => {
+  const handleAddPlayer = (name: string, nickname?: string) => {
     const newPlayer: Player = {
       id: crypto.randomUUID(),
       name,
-      nickname,
+      nickname: nickname?.trim() || undefined,
       xp: 0,
       level: 'Pollito',
       wins: 0,
@@ -63,7 +63,6 @@ const App: React.FC = () => {
     const session = state.activeSessions.find(s => s.id === sessionId);
     if (!session) return;
 
-    // Detect Blanqueo
     const losers = session.players.filter(p => !winners.includes(p));
     const isBlanqueo = losers.every(lId => (scores[lId] || 0) === 0);
 
@@ -98,38 +97,27 @@ const App: React.FC = () => {
             xpGain += XP_REWARDS.CAPICUA;
             if (!p.badges.includes('capicuero')) {
               p.badges.push('capicuero');
-              achievements.push({ id: crypto.randomUUID(), playerId: p.id, type: 'badge_unlocked', title: 'Capicuero', subtitle: `¡${p.nickname} dio el golpe real!`, icon: '🎯', timestamp: Date.now() });
+              achievements.push({ id: crypto.randomUUID(), playerId: p.id, type: 'badge_unlocked', title: 'Capicuero', subtitle: `¡Victoria por Capicúa!`, icon: '🎯', timestamp: Date.now() });
             }
           }
           if (isBlanqueo) {
             xpGain += XP_REWARDS.BLANQUEO_BONUS;
             if (!p.badges.includes('blanqueador')) {
               p.badges.push('blanqueador');
-              achievements.push({ id: crypto.randomUUID(), playerId: p.id, type: 'badge_unlocked', title: 'Blanqueador', subtitle: '¡Los dejó en blanco!', icon: '🧼', timestamp: Date.now() });
+              achievements.push({ id: crypto.randomUUID(), playerId: p.id, type: 'badge_unlocked', title: 'Blanqueador', subtitle: '¡Victoria sin puntos rivales!', icon: '🧼', timestamp: Date.now() });
             }
           }
           if (p.streak === 3 && !p.badges.includes('racha-fuego')) {
             p.badges.push('racha-fuego');
-            achievements.push({ id: crypto.randomUUID(), playerId: p.id, type: 'badge_unlocked', title: 'Racha de Fuego', subtitle: '¡Andas prendío!', icon: '🔥', timestamp: Date.now() });
+            achievements.push({ id: crypto.randomUUID(), playerId: p.id, type: 'badge_unlocked', title: 'Racha Activa', subtitle: '¡Excelente desempeño continuo!', icon: '📈', timestamp: Date.now() });
           }
-          if (p.wins === 10 && !p.badges.includes('matador')) {
-            p.badges.push('matador');
-            achievements.push({ id: crypto.randomUUID(), playerId: p.id, type: 'badge_unlocked', title: 'Matador', subtitle: 'Ya tienes la mano pesada', icon: '⚔️', timestamp: Date.now() });
+          if (p.streak === 10 && !p.badges.includes('racha-leyenda')) {
+            p.badges.push('racha-leyenda');
+            achievements.push({ id: crypto.randomUUID(), playerId: p.id, type: 'badge_unlocked', title: 'Dominio de Liga', subtitle: '¡10 victorias consecutivas registradas!', icon: '⭐', timestamp: Date.now() });
           }
         } else {
           p.losses += 1;
           p.streak = 0;
-          if (session.mode === 'Pintintin') {
-            const myScore = scores[p.id] || 0;
-            const isPato = Object.values(scores).every(s => s >= myScore);
-            if (isPato) {
-              p.pintintinStats.patos += 1;
-              if (p.pintintinStats.patos === 5 && !p.badges.includes('pato-mayor')) {
-                p.badges.push('pato-mayor');
-                achievements.push({ id: crypto.randomUUID(), playerId: p.id, type: 'badge_unlocked', title: 'Pato Mayor', subtitle: 'Buscate un tutorial en Youtube', icon: '🦆', timestamp: Date.now() });
-              }
-            }
-          }
         }
 
         p = updatePlayerXP(p, xpGain);
@@ -138,7 +126,7 @@ const App: React.FC = () => {
             id: crypto.randomUUID(),
             playerId: p.id,
             type: 'level_up',
-            title: `¡Subiste a ${p.level}!`,
+            title: `Ascenso de Rango`,
             subtitle: LEVEL_UP_MESSAGES[Math.floor(Math.random() * LEVEL_UP_MESSAGES.length)],
             icon: '✨',
             timestamp: Date.now()
@@ -164,7 +152,7 @@ const App: React.FC = () => {
 
   const startSession = (mode: GameMode, selectedPlayers: string[]) => {
     if (state.activeSessions.length >= 25) {
-      alert('Límite de 25 mesas alcanzado.');
+      alert('Límite de mesas alcanzado.');
       return;
     }
     const session: LiveSession = {
@@ -199,7 +187,7 @@ const App: React.FC = () => {
     syncState(newState);
   };
 
-  if (isLoading) return <div className="min-h-screen bg-slate-950 flex items-center justify-center"><div className="w-12 h-12 border-4 border-sky-500 border-t-transparent rounded-full animate-spin"></div></div>;
+  if (isLoading) return <div className="min-h-screen bg-slate-950 flex items-center justify-center"><div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
     <HashRouter>
