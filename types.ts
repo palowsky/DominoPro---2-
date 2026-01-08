@@ -35,6 +35,7 @@ export interface Player {
   streak: number;
   badges: string[];
   status: 'active' | 'archived';
+  isAdmin?: boolean;
   lastGameDate?: number;
 }
 
@@ -64,4 +65,5 @@ export interface LeagueState {
   players: Player[];
   games: Game[];
   activeSessions: LiveSession[];
+  adminPin?: string;
 }

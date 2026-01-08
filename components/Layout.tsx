@@ -23,10 +23,17 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           </h1>
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mt-1">LIGA OFICIAL DOMINICANA</p>
         </div>
-        <div className="flex space-x-1">
-          <div className="w-4 h-3 bg-blue-700 rounded-sm"></div>
-          <div className="w-4 h-3 bg-white rounded-sm"></div>
-          <div className="w-4 h-3 bg-red-600 rounded-sm"></div>
+        <div className="relative shadow-xl shadow-blue-900/20 transform hover:scale-105 transition-transform duration-300 group">
+           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 20" className="w-10 h-auto rounded-[3px] border border-white/10">
+              <rect width="30" height="20" fill="white"/>
+              <rect width="13" height="9" fill="#002d62"/>
+              <rect x="17" width="13" height="9" fill="#ce1126"/>
+              <rect y="11" width="13" height="9" fill="#ce1126"/>
+              <rect x="17" y="11" width="13" height="9" fill="#002d62"/>
+              {/* Pequeño detalle del escudo central */}
+              <rect x="13.5" y="8.5" width="3" height="3" rx="0.5" fill="#205a39" className="opacity-80" />
+           </svg>
+           <div className="absolute inset-0 rounded-[3px] ring-1 ring-inset ring-white/5 pointer-events-none"></div>
         </div>
       </header>
 

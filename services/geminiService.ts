@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 
 /**
@@ -8,7 +7,10 @@ import { GoogleGenAI } from "@google/genai";
 
 export async function generateWeeklySummary(leagueDataJson: string): Promise<string> {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+    // Safety check for process.env to prevent ReferenceError in non-node environments
+    const apiKey = (typeof process !== 'undefined' && process.env?.API_KEY) ? process.env.API_KEY : '';
+    
+    const ai = new GoogleGenAI({ apiKey });
     
     const prompt = `
       Actúa como un experto cronista de dominó dominicano con mucho "tigueraje" y jocosidad.

@@ -14,6 +14,7 @@ export const getInitialState = (): LeagueState => ({
   players: [],
   games: [],
   activeSessions: [],
+  adminPin: '1234',
 });
 
 /**
@@ -21,15 +22,25 @@ export const getInitialState = (): LeagueState => ({
  */
 const getDB = (): Promise<IDBDatabase> => {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-    request.onupgradeneeded = () => {
-      const db = request.result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME);
+    try {
+      if (!window.indexedDB) {
+        throw new Error("IndexedDB is not supported");
       }
-    };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+      const request = indexedDB.open(DB_NAME, DB_VERSION);
+      
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME);
+        }
+      };
+      
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+      request.onblocked = () => reject(new Error("Database blocked"));
+    } catch (e) {
+      reject(e);
+    }
   });
 };
 
@@ -40,15 +51,48 @@ export const loadFromDB = async (): Promise<LeagueState> => {
       const transaction = db.transaction(STORE_NAME, 'readonly');
       const store = transaction.objectStore(STORE_NAME);
       const request = store.get('current');
+      
       request.onsuccess = () => {
-        resolve(request.result || getInitialState());
+        const dbResult = request.result;
+        // Logic: Use DB result if it has data. If it's empty/null, try localStorage.
+        if (dbResult && (dbResult.players?.length > 0 || dbResult.games?.length > 0)) {
+           resolve(dbResult);
+        } else {
+           // Fallback to localStorage if DB is fresh or empty
+           const saved = localStorage.getItem('DOMINO_PRO_LAST_STATE');
+           if (saved) {
+             try {
+                const parsed = JSON.parse(saved);
+                resolve(parsed);
+                // Self-heal: populate DB with localstorage data
+                saveToDB(parsed);
+             } catch {
+                resolve(getInitialState());
+             }
+           } else {
+             resolve(getInitialState());
+           }
+        }
       };
-      request.onerror = () => resolve(getInitialState());
+      
+      const handleError = () => {
+        const saved = localStorage.getItem('DOMINO_PRO_LAST_STATE');
+        resolve(saved ? JSON.parse(saved) : getInitialState());
+      };
+
+      request.onerror = handleError;
+      transaction.onabort = handleError;
+      transaction.onerror = handleError;
     });
   } catch (e) {
-    console.error('Failed to load from IndexedDB', e);
+    console.warn('Falling back to localStorage due to DB error', e);
     const saved = localStorage.getItem('DOMINO_PRO_LAST_STATE');
-    return saved ? JSON.parse(saved) : getInitialState();
+    if (!saved) return getInitialState();
+    try {
+      return JSON.parse(saved);
+    } catch (parseError) {
+      return getInitialState();
+    }
   }
 };
 
@@ -72,7 +116,7 @@ export const onStateUpdate = (callback: (state: LeagueState) => void) => {
 export const syncState = (state: LeagueState) => {
   // Save to DB and broadcast to other tabs
   saveToDB(state);
-  localStorage.setItem('DOMINO_PRO_LAST_STATE', JSON.stringify(state)); // Fallback
+  localStorage.setItem('DOMINO_PRO_LAST_STATE', JSON.stringify(state)); // Always keep a fallback copy
   broadcast.postMessage(state);
 };
 
@@ -85,7 +129,7 @@ export const calculateLevel = (xp: number): Level => {
 };
 
 export const updatePlayerXP = (player: Player, xpGain: number): Player => {
-  const newXp = player.xp + xpGain;
+  const newXp = (player.xp || 0) + xpGain;
   return {
     ...player,
     xp: newXp,

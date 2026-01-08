@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -33,6 +32,22 @@
         .animate-streak {
             animation: pulse-patriotic 3s ease-in-out infinite;
         }
+
+        @keyframes fire-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(234, 88, 12, 0.2), inset 0 0 10px rgba(234, 88, 12, 0.05); border-color: rgba(234, 88, 12, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(220, 38, 38, 0.4), inset 0 0 20px rgba(220, 38, 38, 0.1); border-color: rgba(220, 38, 38, 0.6); }
+        }
+        .animate-fire-border {
+            animation: fire-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes text-inferno {
+            0%, 100% { text-shadow: 0 0 10px rgba(255, 69, 0, 0.5); color: #fff; }
+            50% { text-shadow: 0 0 20px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 165, 0, 0.6); color: #ffebd3; }
+        }
+        .animate-inferno-text {
+            animation: text-inferno 1.5s ease-in-out infinite;
+        }
         
         .custom-scrollbar::-webkit-scrollbar {
             width: 4px;
@@ -48,12 +63,15 @@
 <script type="importmap">
 {
   "imports": {
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react": "https://esm.sh/react@19.0.0",
+    "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "react/jsx-runtime": "https://esm.sh/react@19.0.0/jsx-runtime",
+    "@google/genai": "https://esm.sh/@google/genai@1.3.0",
+    "react-router-dom": "https://esm.sh/react-router-dom@7.1.0?deps=react@19.0.0,react-dom@19.0.0",
+    "lucide-react": "https://esm.sh/lucide-react@0.462.0?deps=react@19.0.0",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react-router-dom": "https://esm.sh/react-router-dom@^7.11.0",
     "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
     "vite": "https://esm.sh/vite@^7.3.1",
     "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
   }
@@ -62,5 +80,6 @@
 </head>
 <body class="bg-slate-950 text-slate-100 overflow-x-hidden">
     <div id="root"></div>
+    <script type="module" src="index.tsx"></script>
 </body>
 </html>
